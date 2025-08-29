@@ -10,6 +10,7 @@ public record CustomerGetDTO(
         String surname,
         String dui,
         String email,
-        String phone
+        String phone,
+        boolean active
 ) {
 }

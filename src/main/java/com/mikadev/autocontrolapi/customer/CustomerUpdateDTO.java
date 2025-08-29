@@ -24,6 +24,8 @@ public record CustomerUpdateDTO(
         String phone,
 
         @NotNull(message = "UpdatedBy must not be null")
-        Long updatedById
+        Long updatedById,
+
+        boolean active
 ) {
 }

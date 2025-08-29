@@ -13,60 +13,38 @@ public class CustomerService {
 
     private final CustomerRepository customerRepository;
     private final UserRepository userRepository;
+    private final CustomerMapper customerMapper;
 
     public CustomerService( CustomerRepository customerRepository,
-                            UserRepository userRepository) {
+                            UserRepository userRepository,
+                            CustomerMapper customerMapper) {
         this.customerRepository = customerRepository;
         this.userRepository = userRepository;
+        this.customerMapper = customerMapper;
     }
 
     // findById
     public CustomerGetDTO findById(Long id){
         CustomerEntity customerEntity = customerRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Customer does not exist on database"));
-        return new CustomerGetDTO(
-                customerEntity.getId(),
-                customerEntity.getName(),
-                customerEntity.getSurname(),
-                customerEntity.getDui(),
-                customerEntity.getEmail(),
-                customerEntity.getPhone()
-        );
+        return customerMapper.toDTO(customerEntity);
     }
 
     // findAll
     public List<CustomerGetDTO> findAll(){
         List<CustomerEntity> customerEntityList = customerRepository.findAll();
         return customerEntityList.stream().map(
-                 customerEntity -> new CustomerGetDTO(
-                         customerEntity.getId(), customerEntity.getName(), customerEntity.getSurname(),
-                        customerEntity.getDui(), customerEntity.getEmail(),
-                        customerEntity.getPhone()
-                )).toList();
+                customerMapper::toDTO).toList();
     }
 
     // save
     public CustomerGetDTO save(CustomerPostDTO customerPostDTO){
-        CustomerEntity customerToSave = new CustomerEntity();
-
         UserEntity createdBy = userRepository.findById(customerPostDTO.createdById()).orElseThrow(
                 () -> new ResourceNotFoundException("CreatedBy user does not exist"));
-
-        customerToSave.setName(customerPostDTO.name());
-        customerToSave.setSurname(customerPostDTO.surname());
-        customerToSave.setDui(customerPostDTO.dui());
-        customerToSave.setEmail(customerPostDTO.email());
-        customerToSave.setPhone(customerPostDTO.phone());
-        customerToSave.setCreatedBy(createdBy);
-        customerToSave.setCreatedAt(LocalDateTime.now());
-
+        CustomerEntity customerToSave = customerMapper.toEntityPost(customerPostDTO, createdBy);
         CustomerEntity customerSaved = customerRepository.save(customerToSave);
 
-        return new CustomerGetDTO(
-                customerSaved.getId(),
-                customerSaved.getName(), customerSaved.getSurname(),
-                customerSaved.getDui(), customerSaved.getEmail(),
-                customerSaved.getPhone());
+        return customerMapper.toDTO(customerSaved);
     }
 
     // update
@@ -77,20 +55,9 @@ public class CustomerService {
         UserEntity updatedBy = userRepository.findById(customerUpdateDTO.updatedById()).orElseThrow(
                 () -> new ResourceNotFoundException("UpdatedBy user does not exist. Id is incorrect"));
 
-        customerEntityToUpdate.setName(customerUpdateDTO.name());
-        customerEntityToUpdate.setSurname(customerUpdateDTO.surname());
-        customerEntityToUpdate.setDui(customerUpdateDTO.dui());
-        customerEntityToUpdate.setEmail(customerUpdateDTO.email());
-        customerEntityToUpdate.setPhone(customerUpdateDTO.phone());
-        customerEntityToUpdate.setUpdatedBy(updatedBy);
+        CustomerEntity customerUpdated = customerRepository.save(customerMapper.toEntityPut(customerUpdateDTO, updatedBy));
 
-        CustomerEntity customerUpdated = customerRepository.save(customerEntityToUpdate);
-
-        return new CustomerGetDTO(
-                customerUpdated.getId(),
-                customerUpdated.getName(), customerUpdateDTO.surname(),
-                customerUpdated.getDui(), customerUpdated.getEmail(),
-                customerUpdated.getPhone());
+        return customerMapper.toDTO(customerUpdated);
     }
 
     // deleteById

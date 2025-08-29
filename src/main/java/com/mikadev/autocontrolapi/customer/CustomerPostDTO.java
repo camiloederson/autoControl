@@ -24,6 +24,8 @@ public record CustomerPostDTO(
         String phone,
 
         @NotNull(message = "CreatedBy is required")
-        Long createdById
+        Long createdById,
+
+        boolean active
 ) {
 }
