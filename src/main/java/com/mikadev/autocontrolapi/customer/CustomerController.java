@@ -8,7 +8,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/customers")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = {
+        "http://localhost:4200",
+        "https://scintillating-sprite-cc34e2.netlify.app"
+})
 public class CustomerController {
     private final CustomerService customerService;
 
