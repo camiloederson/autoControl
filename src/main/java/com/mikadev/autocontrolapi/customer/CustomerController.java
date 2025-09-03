@@ -10,7 +10,7 @@ import java.util.List;
 @RequestMapping("api/v1/customers")
 @CrossOrigin(origins = {
         "http://localhost:4200",
-        "https://scintillating-sprite-cc34e2.netlify.app"
+        "https://https://autocontrol-production.up.railway.app"
 })
 public class CustomerController {
     private final CustomerService customerService;
